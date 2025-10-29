@@ -1,9 +1,10 @@
 package com.example.fastcampus_payment
 
-
+import com.example.fastcampus_payment.wallet.CreateWalletRequest
+import com.example.fastcampus_payment.wallet.Wallet
+import com.example.fastcampus_payment.wallet.WalletRepository
+import com.example.fastcampus_payment.wallet.WalletService
 import spock.lang.Specification
-
-import java.awt.event.WindowAdapter
 
 class WalletServiceSpockTest extends Specification {
 
