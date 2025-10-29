@@ -1,5 +1,7 @@
 package com.example.fastcampus_payment.wallet;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -7,6 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Service
 public class WalletService {
+
+    private static final BigDecimal BALANCE_LIMIT = new BigDecimal(10_000_000_000L);
 
     private final WalletRepository walletRepository;
 
@@ -21,35 +25,48 @@ public class WalletService {
         }
         final Wallet wallet = walletRepository.save(new Wallet(request.userId()));
 
-        return new CreateWalletResponse(
-            wallet.getId(),
-            wallet.getUserId(),
-            wallet.getBalance()
-        );
+        return new CreateWalletResponse(wallet.getId(), wallet.getUserId(), wallet.getBalance());
     }
 
     @Transactional
     public FindWalletResponse findWalletByUserId(Long userId) {
-        return walletRepository.findTopByUserId(userId)
-            .map(wallet -> new FindWalletResponse(
-                wallet.getId(),
-                wallet.getUserId(),
-                wallet.getBalance(),
-                wallet.getCreatedAt(),
-                wallet.getUpdatedAt()
-            )).orElse(null);
+        return walletRepository.findTopByUserId(userId).map(
+            wallet -> new FindWalletResponse(wallet.getId(), wallet.getUserId(), wallet.getBalance(),
+                wallet.getCreatedAt(), wallet.getUpdatedAt())).orElse(null);
     }
 
     @Transactional
     public FindWalletResponse findWalletByWalletId(Long walletId) {
-        return walletRepository.findById(walletId)
-            .map(wallet -> new FindWalletResponse(
-                wallet.getId(),
-                wallet.getUserId(),
-                wallet.getBalance(),
-                wallet.getCreatedAt(),
-                wallet.getUpdatedAt()
-            )).orElse(null);
+        return walletRepository.findById(walletId).map(
+            wallet -> new FindWalletResponse(wallet.getId(), wallet.getUserId(), wallet.getBalance(),
+                wallet.getCreatedAt(), wallet.getUpdatedAt())).orElse(null);
+    }
+
+    @Transactional
+    public AddBalanceWalletResponse addBalance(AddBalanceWalletRequest request) {
+        // FIXME
+        // 1. 잔액이 마이너스가 되면 오류가 발생해야한다.
+        // 2. 최대 충전한도는 10만원이다.
+
+        final Wallet wallet = walletRepository.findById(request.walletId())
+            .orElseThrow(() -> new RuntimeException("지갑이 없습니다"));
+
+        BigDecimal balance = wallet.getBalance();
+        balance = balance.add(request.amount());
+
+        if (balance.compareTo(BigDecimal.ZERO) < 0) {
+            throw new RuntimeException("잔액이 충분하지 않습니다");
+        }
+        if (BALANCE_LIMIT.compareTo(balance) < 0) {
+            throw new RuntimeException("한도를 초과했습니다.");
+        }
+
+        wallet.setBalance(balance);
+        wallet.setUpdatedAt(LocalDateTime.now());
+        walletRepository.save(wallet);
+
+        return new AddBalanceWalletResponse(wallet.getId(), wallet.getUserId(), wallet.getBalance(),
+            wallet.getCreatedAt(), wallet.getUpdatedAt());
     }
 
 
