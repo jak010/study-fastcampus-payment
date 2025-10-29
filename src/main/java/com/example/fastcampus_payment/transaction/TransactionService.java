@@ -5,6 +5,7 @@ import com.example.fastcampus_payment.wallet.AddBalanceWalletRequest;
 import com.example.fastcampus_payment.wallet.AddBalanceWalletResponse;
 import com.example.fastcampus_payment.wallet.FindWalletResponse;
 import com.example.fastcampus_payment.wallet.WalletService;
+import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,8 +35,32 @@ public class TransactionService {
             request.orderId(), request.amount());
         transactionRepository.save(transaction);
         return new ChargeTransactionResponse(wallet.id(), wallet.balance());
+    }
+
+    @Transactional
+    public PaymentTransactionResponse payment(PaymentTransactionRequest request) {
+        // FIXME
+        if (transactionRepository.findTransactionByOrderId(request.courseId()).isPresent()) {
+            throw new RuntimeException("이미 결제 된 강좌입니다.");
+        }
+        final FindWalletResponse findWalletResponse = walletService.findWalletByWalletId(request.walletId());
+        final AddBalanceWalletResponse wallet = walletService.addBalance(
+            new AddBalanceWalletRequest(findWalletResponse.id(), request.amount().negate()));
+
+        final Transaction transaction = Transaction.createPaymentTransaction(wallet.userId(), wallet.id(),
+            request.courseId(), request.amount());
+
+        transactionRepository.save(transaction);
+        return new PaymentTransactionResponse(wallet.id(), wallet.balance());
 
 
+    }
+
+    public void pgPayment() {
+        // TODO not yet implements
+        // 여러분들의 구현
+        final Transaction transaction = Transaction.createPaymentTransaction(1L, null, "10", new BigDecimal(1000));
+        transactionRepository.save(transaction);
     }
 
 
