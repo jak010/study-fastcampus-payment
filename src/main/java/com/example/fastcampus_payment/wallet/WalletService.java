@@ -26,8 +26,30 @@ public class WalletService {
             wallet.getUserId(),
             wallet.getBalance()
         );
+    }
 
+    @Transactional
+    public FindWalletResponse findWalletByUserId(Long userId) {
+        return walletRepository.findTopByUserId(userId)
+            .map(wallet -> new FindWalletResponse(
+                wallet.getId(),
+                wallet.getUserId(),
+                wallet.getBalance(),
+                wallet.getCreatedAt(),
+                wallet.getUpdatedAt()
+            )).orElse(null);
+    }
 
+    @Transactional
+    public FindWalletResponse findWalletByWalletId(Long walletId) {
+        return walletRepository.findById(walletId)
+            .map(wallet -> new FindWalletResponse(
+                wallet.getId(),
+                wallet.getUserId(),
+                wallet.getBalance(),
+                wallet.getCreatedAt(),
+                wallet.getUpdatedAt()
+            )).orElse(null);
     }
 
 
