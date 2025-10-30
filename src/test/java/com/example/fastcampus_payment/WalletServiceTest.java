@@ -2,12 +2,15 @@ package com.example.fastcampus_payment;
 
 import static org.mockito.Mockito.when;
 
+import com.example.fastcampus_payment.wallet.AddBalanceWalletRequest;
+import com.example.fastcampus_payment.wallet.AddBalanceWalletResponse;
 import com.example.fastcampus_payment.wallet.CreateWalletRequest;
 import com.example.fastcampus_payment.wallet.CreateWalletResponse;
 import com.example.fastcampus_payment.wallet.Wallet;
 import com.example.fastcampus_payment.wallet.WalletRepository;
 import com.example.fastcampus_payment.wallet.WalletService;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -88,7 +91,7 @@ class WalletServiceTest {
 
     @Test
     @Transactional
-    @DisplayName("지갑을 조회한다. - 생성되어있지 않은 경우")
+    @DisplayName("지갑을 조회한다. - 생성되어 있지 않은 경우")
     void test04() {
         // given
         Wallet wallet = new Wallet(1L);
@@ -102,7 +105,35 @@ class WalletServiceTest {
 
         // then
         Assertions.assertTrue(result.isEmpty());  // 값이 존재하는지 확인
-        
+
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("지갑 잔액 추가 시 지갑이 존재하고 잔액이 충분하면 잔액이 업데이트된다.")
+    void test05() {
+        Long walletId = 1L;
+        BigDecimal intialBalance = new BigDecimal("200.00");
+        BigDecimal addAmount = new BigDecimal("100.00");
+        Wallet wallet = new Wallet(
+            walletId,
+            walletId,
+            intialBalance,
+            LocalDateTime.now(),
+            LocalDateTime.now()
+        );
+
+        // mock
+        when(walletRepository.findById(walletId))
+            .thenReturn(Optional.of(wallet));
+
+        // when
+        AddBalanceWalletResponse addBalanceWalletResponse = walletService.addBalance(
+            new AddBalanceWalletRequest(1L, addAmount)
+        );
+
+        // then
+        Assertions.assertEquals(addBalanceWalletResponse.balance(), new BigDecimal("300.00"));
     }
 
 
