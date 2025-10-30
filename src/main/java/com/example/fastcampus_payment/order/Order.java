@@ -28,7 +28,7 @@ public class Order {
 
     private BigDecimal amount;
 
-    private String requestsId;
+    private String requestId;
     private Long courseId;
 
     private String courseName;

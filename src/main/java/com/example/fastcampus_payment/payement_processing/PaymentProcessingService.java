@@ -34,6 +34,23 @@ public class PaymentProcessingService {
     private final RetryRequestRepository retryRequestRepository;
     private final ObjectMapper objectMapper;
 
+    public void createPayment(ConfirmRequest confirmRequest) {
+         /*
+        3. 결제서비스 > PG 승인 요청
+        4. 결제서비스 > 결제기록 저장
+            > 결제수단으로 바로 결제하는 메서드 구현
+        ...
+        6. 주문서비스에 응답
+        7. 주문을 APPROVED 상태로 변경
+         */
+
+        paymentGatewayService.confirm(confirmRequest);
+        transactionService.pgPayment();
+
+        approveOrder(confirmRequest.orderId());
+    }
+
+
     public void createCharge(ConfirmRequest confirmRequest, boolean isRetry) {
 
         try {
