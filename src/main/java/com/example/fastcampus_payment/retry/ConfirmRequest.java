@@ -1,5 +1,5 @@
 package com.example.fastcampus_payment.retry;
 
-public class ConfirmRequest {
+public record ConfirmRequest(String paymentKey, String orderId, String amount) {
 
 }
