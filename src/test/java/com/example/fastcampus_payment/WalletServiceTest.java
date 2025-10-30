@@ -182,5 +182,34 @@ class WalletServiceTest {
         });
     }
 
+    @Test
+    @Transactional
+    @DisplayName("지갑 잔액 추가 시, 한도를 초과하면 예외가 발생한다.")
+    public void test08() {
+        Long walletId = 1L;
+        BigDecimal addAmount = new BigDecimal(100_000_000_000L);
+        BigDecimal initialBalance = new BigDecimal(100);
+        Wallet wallet = new Wallet(
+            walletId,
+            walletId,
+            initialBalance,
+            LocalDateTime.now(),
+            LocalDateTime.now()
+        );
+
+        // mock
+        when(walletRepository.findById(walletId))
+            .thenReturn(Optional.of(wallet));
+
+        // when && then
+        Assertions.assertThrows(RuntimeException.class, () -> {
+            walletService.addBalance(
+                new AddBalanceWalletRequest(walletId, addAmount)
+            );
+        });
+
+
+    }
+
 
 }
