@@ -1,6 +1,5 @@
 package com.example.fastcampus_payment;
 
-import static org.mockito.ArgumentMatchers.isNotNull;
 import static org.mockito.Mockito.when;
 
 import com.example.fastcampus_payment.wallet.CreateWalletRequest;
@@ -8,16 +7,12 @@ import com.example.fastcampus_payment.wallet.CreateWalletResponse;
 import com.example.fastcampus_payment.wallet.Wallet;
 import com.example.fastcampus_payment.wallet.WalletRepository;
 import com.example.fastcampus_payment.wallet.WalletService;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import java.math.BigDecimal;
 import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
