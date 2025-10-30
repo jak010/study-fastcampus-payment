@@ -9,6 +9,7 @@ import com.example.fastcampus_payment.wallet.CreateWalletResponse;
 import com.example.fastcampus_payment.wallet.Wallet;
 import com.example.fastcampus_payment.wallet.WalletRepository;
 import com.example.fastcampus_payment.wallet.WalletService;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -134,6 +135,25 @@ class WalletServiceTest {
 
         // then
         Assertions.assertEquals(addBalanceWalletResponse.balance(), new BigDecimal("300.00"));
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("지갑 잔액 추가 시, 지갑이 존재하지 않으면 예외가 발생한다.")
+    void test06() {
+        Long walletId = 999L;
+        BigDecimal addAmount = new BigDecimal("100.00");
+
+        // mock
+        when(walletRepository.findById(walletId))
+            .thenReturn(Optional.empty());
+
+        // when && then
+        Assertions.assertThrows(RuntimeException.class, () -> {
+            AddBalanceWalletResponse addBalanceWalletResponse = walletService.addBalance(
+                new AddBalanceWalletRequest(walletId, addAmount)
+            );
+        });
     }
 
 
