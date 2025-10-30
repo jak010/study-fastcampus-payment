@@ -45,7 +45,7 @@ public class PaymentProcessingService {
          */
 
         paymentGatewayService.confirm(confirmRequest);
-        transactionService.pgPayment();
+        transactionService.pgPayment(); // FIXMe not yet
 
         approveOrder(confirmRequest.orderId());
     }
