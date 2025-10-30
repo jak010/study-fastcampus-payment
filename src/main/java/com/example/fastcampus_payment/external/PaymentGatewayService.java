@@ -1,6 +1,6 @@
 package com.example.fastcampus_payment.external;
 
-import com.example.fastcampus_payment.retry.ConfirmRequest;
+import com.example.fastcampus_payment.checkout.ConfirmRequest;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Base64;
