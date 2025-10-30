@@ -86,5 +86,24 @@ class WalletServiceTest {
         Assertions.assertEquals(1L, result.get().getUserId());  // userId 확인
     }
 
+    @Test
+    @Transactional
+    @DisplayName("지갑을 조회한다. - 생성되어있지 않은 경우")
+    void test04() {
+        // given
+        Wallet wallet = new Wallet(1L);
+        wallet.setBalance(new BigDecimal(1000));
+
+        // when
+        when(walletRepository.findTopByUserId(1L))
+            .thenReturn(Optional.empty());
+
+        Optional<Wallet> result = walletRepository.findTopByUserId(1L);
+
+        // then
+        Assertions.assertTrue(result.isEmpty());  // 값이 존재하는지 확인
+        
+    }
+
 
 }
