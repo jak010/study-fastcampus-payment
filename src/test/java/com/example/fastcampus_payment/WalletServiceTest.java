@@ -13,6 +13,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Optional;
+import net.bytebuddy.asm.Advice.Local;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -147,6 +148,31 @@ class WalletServiceTest {
         // mock
         when(walletRepository.findById(walletId))
             .thenReturn(Optional.empty());
+
+        // when && then
+        Assertions.assertThrows(RuntimeException.class, () -> {
+            AddBalanceWalletResponse addBalanceWalletResponse = walletService.addBalance(
+                new AddBalanceWalletRequest(walletId, addAmount)
+            );
+        });
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("지갑 잔액 추가 시, 잔액이 부족하면 예외가 발생한다")
+    void test07() {
+        Long walletId = 1L;
+        BigDecimal addAmount = new BigDecimal("-101.00");
+        BigDecimal initialBalance = new BigDecimal("100.00");
+
+        Wallet wallet = new Wallet(
+            walletId, walletId, initialBalance,
+            LocalDateTime.now(), LocalDateTime.now()
+        );
+
+        // mock
+        when(walletRepository.findById(walletId))
+            .thenReturn(Optional.of(wallet));
 
         // when && then
         Assertions.assertThrows(RuntimeException.class, () -> {
